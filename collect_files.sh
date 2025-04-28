@@ -48,3 +48,4 @@ eval "$find_command" | while read -r file; do
 
     cp "$file" "$target"
 done
+# Скрипт для копирования файлов без структуры директорий
