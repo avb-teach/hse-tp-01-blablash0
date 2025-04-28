@@ -20,7 +20,7 @@ fi
 
 mkdir -p "$output_dir"
 
-find_command="find \"$input_dir\" -type f"
+find_command="find \"$input_dir\" -mindepth $max_depth -maxdepth $max_depth -type f"
 if [ -n "$max_depth" ]; then
     find_command="find \"$input_dir\" -maxdepth $max_depth -type f"
 fi
