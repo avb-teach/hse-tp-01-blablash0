@@ -20,7 +20,7 @@ fi
 
 mkdir -p "$output_dir"
 
-find_command="find \"$input_dir\" -mindepth $max_depth -maxdepth $max_depth -type f"
+find_command="find \"$input_dir\" -type f"
 if [ -n "$max_depth" ]; then
     find_command="find \"$input_dir\" -maxdepth $max_depth -type f"
 fi
@@ -28,14 +28,27 @@ fi
 eval "$find_command" |
 while read -r file; do
     base_name=$(basename "$file")
-    target="$output_dir/$base_name"
+    name="${base_name%.*}"
+    ext="${base_name##*.}"
+
+    if [ "$name" = "$ext" ]; then
+  # Файл без расширения
+      target="$output_dir/$name"
+    else
+      target="$output_dir/$name.$ext"
+    fi
 
     counter=1
     while [ -e "$target" ]; do
-        target="$output_dir/${base_name%.*}_$counter.${base_name##*.}"
-        counter=$((counter + 1))
+      if [ "$name" = "$ext" ]; then
+        target="$output_dir/${name}_$counter"
+      else
+        target="$output_dir/${name}_$counter.$ext"
+      fi
+      counter=$((counter + 1))
     done
 
     cp "$file" "$target"
+
 done
 # Скрипт для копирования файлов без структуры директорий
