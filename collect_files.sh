@@ -20,31 +20,15 @@ fi
 
 mkdir -p "$output_dir"
 
-find_command="find \"$input_dir\" -type f"
+find_cmd=(find "$input_dir" -type f)
 if [ -n "$max_depth" ]; then
-    find_command="find \"$input_dir\" -maxdepth $max_depth -type f"
+    find_cmd=(find "$input_dir" -maxdepth "$max_depth" -type f)
 fi
 
-eval "$find_command" | while read -r file; do
-    base_name=$(basename "$file")
-    name="${base_name%.*}"
-    ext="${base_name##*.}"
+"${find_cmd[@]}" | while read -r filepath; do
+    rel_path="${filepath#$input_dir/}" 
+    target_path="$output_dir/$rel_path"
 
-    if [ "$name" = "$ext" ]; then
-        target="$output_dir/$name"
-    else
-        target="$output_dir/$name.$ext"
-    fi
-
-    counter=1
-    while [ -e "$target" ]; do
-        if [ "$name" = "$ext" ]; then
-            target="$output_dir/${name}_$counter"
-        else
-            target="$output_dir/${name}_$counter.$ext"
-        fi
-        counter=$((counter + 1))
-    done
-
-    cp "$file" "$target"
+    mkdir -p "$(dirname "$target_path")"
+    cp "$filepath" "$target_path"
 done
